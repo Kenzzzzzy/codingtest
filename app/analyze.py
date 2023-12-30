@@ -5,6 +5,15 @@ import config
 
 
 def analyze_image(path):
+    """
+    画像分析APIをコールする
+    
+    Paramaters
+    ---
+    path : str
+        画像パス
+    """
+    
     form_data = {
         'image_path': path
     }
@@ -22,10 +31,17 @@ def analyze_image(path):
             # コールエラーを確認
             response.raise_for_status()
             
-            # レスポンスに時刻追加
-            response_json = response.json()
-            response_json['resquest_time'] = int(request_time)
-            response_json['response_time'] = int(response_time)
+            # レスポンス整形
+            temp = response.json()
+            response_json = {
+                'image_path': path,
+                'success': temp['success'],
+                'message': temp['message'],
+                'class': temp['estimated_data'].get('class', None),
+                'confidence': temp['estimated_data'].get('confidence', None),
+                'request_timestamp': int(request_time),
+                'response_timestamp': int(response_time)
+            } 
 
             print(f'レスポンス：{response_json}')
             return response_json
